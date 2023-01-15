@@ -1,0 +1,7 @@
+# How to create an ISO using Mac
+# https://www.youtube.com/watch?v=XV_bfhldzWs
+
+sudo diskutil list
+sudo diskutil eraseDisk FAT32 USB /dev/disk3  
+sudo diskutil unmountDisk /dev/disk3
+sudo dd if=./SUU-LIN32_17.10.200.209.ISO of=/dev/disk3 bs=1m
