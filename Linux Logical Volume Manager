@@ -1,0 +1,88 @@
+Linux Logical Volume Manager
+# commands
+
+$ lsblk
+
+$ pvdisplay
+
+$ vgdisplay
+
+$ lvdisplay
+
+# Be very carefull when using (Need root priv)
+
+$ pvcreate
+
+$ vgextend [name of vol gp you want to extend] [/dev/sdb]
+
+$ lvextend -L +10G /dev/mapper/dev/ubuntu-vg/ubuntu-lv
+
+$ resize2fs /dev/mapper/dev/ubuntu-vg/ubuntu-lv
+
+# install LVM Manually
+
+$ lvextend --resizefs -l +100%FREE /dev/mapper/dev/ubuntu-vg/ubuntu-lv
+
+$ mkfs.ext4 /dev/mapper/dev/ubuntu-vg/ubuntu-lv
+
+# Create and mount folders
+
+$ mkdir -p /mnt/extra/logs
+$ mount /dev/mapper/vg_extra-lv_logs /mnt/extra/logs
+
+# How to auto mount
+
+$ blkid /dev/mapper/dev/ubuntu-vg/ubuntu-lv
+$ cp /etc/fstab /etc/fstab.bk
+$ umount /mnt/extra/logs
+$ nano /etc/fstab
+  * [uuid/d09291e1-318f-49ce-ba78-fb772b17ab8a /boot ext4 defaults 0 2]
+
+# Test the fstab file
+$ mount -a
+$ df -h
+
+# This is how I increased volume size and resized the logical Volume
+
+wrodney@hxtybx1plex01:~$ df -h
+Filesystem                         Size  Used Avail Use% Mounted on
+tmpfs                              6.3G  1.9M  6.3G   1% /run
+/dev/mapper/ubuntu--vg-ubuntu--lv   98G   12G   82G  13% /
+tmpfs                               32G  4.0K   32G   1% /dev/shm
+tmpfs                              5.0M     0  5.0M   0% /run/lock
+/dev/sda2                          2.0G  136M  1.7G   8% /boot
+tmpfs                              6.3G  4.0K  6.3G   1% /run/user/1000
+wrodney@hxtybx1plex01:~$ sudo lvextend -L +500G /dev/mapper/ubuntu--vg-ubuntu--lv
+[sudo] password for wrodney: 
+  Size of logical volume ubuntu-vg/ubuntu-lv changed from 100.00 GiB (25600 extents) to 600.00 GiB (153600 extents).
+  Logical volume ubuntu-vg/ubuntu-lv successfully resized.
+wrodney@hxtybx1plex01:~$ df -h
+Filesystem                         Size  Used Avail Use% Mounted on
+tmpfs                              6.3G  1.9M  6.3G   1% /run
+/dev/mapper/ubuntu--vg-ubuntu--lv   98G   12G   82G  13% /
+tmpfs                               32G  4.0K   32G   1% /dev/shm
+tmpfs                              5.0M     0  5.0M   0% /run/lock
+/dev/sda2                          2.0G  136M  1.7G   8% /boot
+tmpfs                              6.3G  4.0K  6.3G   1% /run/user/1000
+wrodney@hxtybx1plex01:~$ resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+resize2fs 1.46.5 (30-Dec-2021)
+open: Permission denied while opening /dev/mapper/ubuntu--vg-ubuntu--lv
+wrodney@hxtybx1plex01:~$ sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+resize2fs 1.46.5 (30-Dec-2021)
+Filesystem at /dev/mapper/ubuntu--vg-ubuntu--lv is mounted on /; on-line resizing required
+old_desc_blocks = 13, new_desc_blocks = 75
+The filesystem on /dev/mapper/ubuntu--vg-ubuntu--lv is now 157286400 (4k) blocks long.
+
+wrodney@hxtybx1plex01:~$ df -h
+Filesystem                         Size  Used Avail Use% Mounted on
+tmpfs                              6.3G  1.9M  6.3G   1% /run
+/dev/mapper/ubuntu--vg-ubuntu--lv  591G   12G  554G   3% /
+tmpfs                               32G  4.0K   32G   1% /dev/shm
+tmpfs                              5.0M     0  5.0M   0% /run/lock
+/dev/sda2                          2.0G  136M  1.7G   8% /boot
+tmpfs                              6.3G  4.0K  6.3G   1% /run/user/1000
+wrodney@hxtybx1plex01:~$ 
+
+## This is how you allocate 100% of lv space
+
+$lvextend --resize -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
