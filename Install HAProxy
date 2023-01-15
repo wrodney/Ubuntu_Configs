@@ -1,0 +1,46 @@
+Install HAProxy
+Installation is relatively easy. The below yum command will install the necessary packages along with HAProxy.
+
+yum install haproxy
+The end of the output will look like this.
+
+Running transaction
+  Installing : haproxy-1.5.18-9.el7.x86_64                    1/1
+  Verifying  : haproxy-1.5.18-9.el7.x86_64                    1/1
+
+Installed:
+  haproxy.x86_64 0:1.5.18-9.el7
+Next, we have to verify that HAProxy starts every time we reboot our server. We can accomplish that with the chkconfig command below.
+
+chkconfig haproxy on
+The command’s output will let you know that a symbolic link (symlink) was created for the HAProxy service. A symlink is a feature that helps link to a specific file or folder on your server.
+
+Note: Forwarding request to 'systemctl enable haproxy.service'.
+Created symlink from /etc/systemd/system/multi-user.target.wants/haproxy.service to /usr/lib/systemd/system/haproxy.service.
+Now we will make sure we are allowing the HAProxy service to run through our firewall. The first command will enable the http server in the firewall.
+
+firewall-cmd --permanent --zone=public --add-service=http
+The next one will permanently open port 8181 in the firewall.
+
+firewall-cmd --permanent --zone=public --add-port=8181/tcp
+And the last one will reload the firewall.
+
+firewall-cmd --reload
+All of them will have the same output, as shown below.
+
+success
+Starting the Service
+Let’s start the service and make sure it’s running. Input the following command to your terminal.
+
+systemctl start haproxy && systemctl status haproxy
+The output will look like the one below confirms the service is up and running.
+
+● haproxy.service - HAProxy Load Balancer
+   Loaded: loaded (/usr/lib/systemd/system/haproxy.service; enabled; vendor preset: disabled)
+   Active: active (running) since Tue 2021-04-27 18:28:06 EDT; 38s ago
+ Main PID: 86812 (haproxy-systemd)
+   CGroup: /system.slice/haproxy.service
+           ├─86812 /usr/sbin/haproxy-systemd-wrapper -f /etc/haproxy/haproxy.cfg -p /run/haproxy.pid
+           ├─86813 /usr/sbin/haproxy -f /etc/haproxy/haproxy.cfg -p /run/haproxy.pid -Ds
+           └─86815 /usr/sbin/haproxy -f /etc/haproxy/haproxy.cfg -p /run/haproxy.pid -Ds
+You have successfully installed HAProxy on your server. Let’s move on to configuring the load balancer.
