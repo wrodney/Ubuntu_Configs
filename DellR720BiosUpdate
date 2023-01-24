@@ -1,0 +1,18 @@
+Update Bios Dell R720
+
+Download .efi bios file from dell.com
+boot system - @Post F11
+	Boot Manager Main Menu
+	System Utilities
+	BIOS Update File Explorer
+	Select the USB Drive w/.efi file you downloaded
+	Click on the .efi file - this will start the Bios Update.
+	Click "Continue BIOS Update"
+	Wait for BIOS update to complete
+	Done!
+
+	#Check Bios on System
+	Boot System @Post F2
+	@ System Setup Main Menu
+	Click on System BIOS
+	then System information - Here you will system BIOS Information
